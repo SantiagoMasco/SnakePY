@@ -6,6 +6,7 @@ import random
 snakePositionX = [23]
 snakePositionY = [17]
 direction = "RIGHT"
+running = True
 
 def draw_maze(maze, screen, screen_width, screen_height):
     block_size = 25
@@ -25,7 +26,7 @@ def draw_maze(maze, screen, screen_width, screen_height):
 
 
 def start_game():
-    global snakePositionX, snakePositionY, direction
+    global snakePositionX, snakePositionY, direction, running
 
     screen_width = 1200
     screen_height = 900
@@ -36,8 +37,6 @@ def start_game():
 
     with open("maze.txt", "r") as file:
         maze = [[int(cell) for cell in line.strip().split(",")] for line in file if line.strip()]
-
-    running = True
 
     addFood(maze)
 
@@ -86,16 +85,16 @@ def addFood(maze):
 
 
 def move(maze):
-    global snakePositionX, snakePositionY, direction
+    global snakePositionX, snakePositionY, direction, running
 
     if direction == "UP":
-
-        if maze[snakePositionY[0] - 1][snakePositionX[0]] == 3:
+        if maze[snakePositionY[0] - 1][snakePositionX[0]] == 0 or maze[snakePositionY[0] - 1][snakePositionX[0]] == 2:
+            running = False
+        elif maze[snakePositionY[0] - 1][snakePositionX[0]] == 3:
             addFood(maze)
             snakePositionY.insert(0, snakePositionY[0] - 1)
             snakePositionX.insert(0, snakePositionX[0])
             maze[snakePositionY[0]][snakePositionX[0]] = 2
-
         else:
             maze[snakePositionY[-1]][snakePositionX[-1]] = 1
             moveSnakeBody(snakePositionX)
@@ -104,7 +103,9 @@ def move(maze):
             maze[snakePositionY[0]][snakePositionX[0]] = 2
 
     elif direction == "DOWN":
-        if maze[snakePositionY[0] + 1][snakePositionX[0]] == 3:
+        if maze[snakePositionY[0] + 1][snakePositionX[0]] == 0 or maze[snakePositionY[0] + 1][snakePositionX[0]] == 2:
+            running = False
+        elif maze[snakePositionY[0] + 1][snakePositionX[0]] == 3:
             addFood(maze)
             snakePositionY.insert(0, snakePositionY[0] + 1)
             snakePositionX.insert(0, snakePositionX[0])
@@ -117,7 +118,9 @@ def move(maze):
             maze[snakePositionY[0]][snakePositionX[0]] = 2
 
     elif direction == "RIGHT":
-        if maze[snakePositionY[0]][snakePositionX[0] + 1] == 3:
+        if maze[snakePositionY[0]][snakePositionX[0] + 1] == 0 or maze[snakePositionY[0]][snakePositionX[0] + 1] == 2:
+            running = False
+        elif maze[snakePositionY[0]][snakePositionX[0] + 1] == 3:
             addFood(maze)
             snakePositionX.insert(0, snakePositionX[0] + 1)
             snakePositionY.insert(0, snakePositionY[0])
@@ -130,7 +133,9 @@ def move(maze):
             maze[snakePositionY[0]][snakePositionX[0]] = 2
 
     elif direction == "LEFT":
-        if maze[snakePositionY[0]][snakePositionX[0] - 1] == 3:
+        if maze[snakePositionY[0]][snakePositionX[0] - 1] == 0 or maze[snakePositionY[0]][snakePositionX[0] - 1] == 2:
+            running = False
+        elif maze[snakePositionY[0]][snakePositionX[0] - 1] == 3:
             addFood(maze)
             snakePositionX.insert(0, snakePositionX[0] - 1)
             snakePositionY.insert(0, snakePositionY[0])
