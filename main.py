@@ -6,6 +6,7 @@ import random
 snakePositionX = [23]
 snakePositionY = [17]
 direction = "RIGHT"
+
 def draw_maze(maze, screen, screen_width, screen_height):
     block_size = 25
 
@@ -86,33 +87,67 @@ def addFood(maze):
 
 def move(maze):
     global snakePositionX, snakePositionY, direction
+
     if direction == "UP":
-        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
-        moveSnakeBody(snakePositionX)
-        moveSnakeBody(snakePositionY)
-        snakePositionY[0] -= 1
-        maze[snakePositionY[0]][snakePositionX[0]] = 2
+
+        if maze[snakePositionY[0] - 1][snakePositionX[0]] == 3:
+            addFood(maze)
+            snakePositionY.insert(0, snakePositionY[0] - 1)
+            snakePositionX.insert(0, snakePositionX[0])
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+
+        else:
+            maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+            moveSnakeBody(snakePositionX)
+            moveSnakeBody(snakePositionY)
+            snakePositionY[0] -= 1
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+
     elif direction == "DOWN":
-        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
-        moveSnakeBody(snakePositionX)
-        moveSnakeBody(snakePositionY)
-        snakePositionY[0] += 1
-        maze[snakePositionY[0]][snakePositionX[0]] = 2
+        if maze[snakePositionY[0] + 1][snakePositionX[0]] == 3:
+            addFood(maze)
+            snakePositionY.insert(0, snakePositionY[0] + 1)
+            snakePositionX.insert(0, snakePositionX[0])
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+        else:
+            maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+            moveSnakeBody(snakePositionX)
+            moveSnakeBody(snakePositionY)
+            snakePositionY[0] += 1
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+
     elif direction == "RIGHT":
-        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
-        moveSnakeBody(snakePositionX)
-        moveSnakeBody(snakePositionY)
-        snakePositionX[0] += 1
-        maze[snakePositionY[0]][snakePositionX[0]] = 2
-    else:
-        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
-        moveSnakeBody(snakePositionX)
-        moveSnakeBody(snakePositionY)
-        snakePositionX[0] -= 1
-        maze[snakePositionY[0]][snakePositionX[0]] = 2
+        if maze[snakePositionY[0]][snakePositionX[0] + 1] == 3:
+            addFood(maze)
+            snakePositionX.insert(0, snakePositionX[0] + 1)
+            snakePositionY.insert(0, snakePositionY[0])
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+        else:
+            maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+            moveSnakeBody(snakePositionX)
+            moveSnakeBody(snakePositionY)
+            snakePositionX[0] += 1
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+
+    elif direction == "LEFT":
+        if maze[snakePositionY[0]][snakePositionX[0] - 1] == 3:
+            addFood(maze)
+            snakePositionX.insert(0, snakePositionX[0] - 1)
+            snakePositionY.insert(0, snakePositionY[0])
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+        else:
+            maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+            moveSnakeBody(snakePositionX)
+            moveSnakeBody(snakePositionY)
+            snakePositionX[0] -= 1
+            maze[snakePositionY[0]][snakePositionX[0]] = 2
+
 
 def moveSnakeBody(snakePosition):
-    for i in range(len(snakePosition) - 1, -1, -1):
-        snakePosition[i] = snakePosition[i - 1]
+    newSnakePosition = [snakePosition[0]]
+    for i in range(1, len(snakePosition)):
+        newSnakePosition.append(snakePosition[i - 1])
+    snakePosition[:] = newSnakePosition
+
 
 start_game()
