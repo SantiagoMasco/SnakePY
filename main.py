@@ -2,8 +2,8 @@ import time
 
 import pygame
 
-snakePositionX = 23
-snakePositionY = 17
+snakePositionX = [23]
+snakePositionY = [17]
 direction = "RIGHT"
 def draw_maze(maze, screen, screen_width, screen_height):
     block_size = 25
@@ -38,7 +38,7 @@ def start_game():
     running = True
 
     while running:
-        maze[snakePositionY][snakePositionX] = 2
+        maze[snakePositionY[0]][snakePositionX[0]] = 2
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -73,20 +73,20 @@ def start_game():
 def move(maze):
     global snakePositionX, snakePositionY
     if(direction == "UP"):
-        maze[snakePositionY][snakePositionX] = 1
-        snakePositionY -= 1
-        maze[snakePositionY][snakePositionX] = 2
+        maze[snakePositionY[0]][snakePositionX[0]] = 1
+        snakePositionY[0] -= 1
+        maze[snakePositionY[0]][snakePositionX[0]] = 2
     elif(direction == "DOWN"):
-        maze[snakePositionY][snakePositionX] = 1
-        snakePositionY += 1
-        maze[snakePositionY][snakePositionX] = 2
+        maze[snakePositionY[0]][snakePositionX[0]] = 1
+        snakePositionY[0] += 1
+        maze[snakePositionY[0]][snakePositionX[0]] = 2
     elif(direction == "RIGHT"):
-        maze[snakePositionY][snakePositionX] = 1
-        snakePositionX += 1
-        maze[snakePositionY][snakePositionX] = 2
+        maze[snakePositionY[0]][snakePositionX[0]] = 1
+        snakePositionX[0] += 1
+        maze[snakePositionY[0]][snakePositionX[0]] = 2
     else:
-        maze[snakePositionY][snakePositionX] = 1
-        snakePositionX -= 1
-        maze[snakePositionY][snakePositionX] = 2
+        maze[snakePositionY[0]][snakePositionX[0]] = 1
+        snakePositionX[0] -= 1
+        maze[snakePositionY[0]][snakePositionX[0]] = 2
 
 start_game()
