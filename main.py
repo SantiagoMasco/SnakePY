@@ -1,6 +1,7 @@
 import time
 
 import pygame
+import random
 
 snakePositionX = [23]
 snakePositionY = [17]
@@ -37,6 +38,8 @@ def start_game():
 
     running = True
 
+    addFood(maze)
+
     while running:
         maze[snakePositionY[0]][snakePositionX[0]] = 2
         for event in pygame.event.get():
@@ -58,6 +61,8 @@ def start_game():
                     if(direction != "RIGHT"):
                         direction = "LEFT"
         move(maze)
+
+
         if(running == True):
             draw_maze(maze, screen, screen_width, screen_height)
         if maze[19][28] == 2:
@@ -68,25 +73,46 @@ def start_game():
 
     pygame.quit()
 
+def addFood(maze):
+    foodY = random.randint(1, 34)
+    foodX = random.randint(1, 46)
+    if (maze[foodY][foodX] == maze[23][17]):
+        maze[foodY][foodX] = 3
+    else:
+        #Preguntar porque no sirve la recursividad.
+        #addFood(maze)
+        maze[foodX+1][foodY+1] = 3
 
 
 def move(maze):
-    global snakePositionX, snakePositionY
-    if(direction == "UP"):
-        maze[snakePositionY[0]][snakePositionX[0]] = 1
+    global snakePositionX, snakePositionY, direction
+    if direction == "UP":
+        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+        moveSnakeBody(snakePositionX)
+        moveSnakeBody(snakePositionY)
         snakePositionY[0] -= 1
         maze[snakePositionY[0]][snakePositionX[0]] = 2
-    elif(direction == "DOWN"):
-        maze[snakePositionY[0]][snakePositionX[0]] = 1
+    elif direction == "DOWN":
+        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+        moveSnakeBody(snakePositionX)
+        moveSnakeBody(snakePositionY)
         snakePositionY[0] += 1
         maze[snakePositionY[0]][snakePositionX[0]] = 2
-    elif(direction == "RIGHT"):
-        maze[snakePositionY[0]][snakePositionX[0]] = 1
+    elif direction == "RIGHT":
+        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+        moveSnakeBody(snakePositionX)
+        moveSnakeBody(snakePositionY)
         snakePositionX[0] += 1
         maze[snakePositionY[0]][snakePositionX[0]] = 2
     else:
-        maze[snakePositionY[0]][snakePositionX[0]] = 1
+        maze[snakePositionY[-1]][snakePositionX[-1]] = 1
+        moveSnakeBody(snakePositionX)
+        moveSnakeBody(snakePositionY)
         snakePositionX[0] -= 1
         maze[snakePositionY[0]][snakePositionX[0]] = 2
+
+def moveSnakeBody(snakePosition):
+    for i in range(len(snakePosition) - 1, -1, -1):
+        snakePosition[i] = snakePosition[i - 1]
 
 start_game()
