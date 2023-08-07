@@ -2,13 +2,76 @@ import time
 
 import pygame
 import random
+import mysql.connector
 
 snakePositionX = [23]
 snakePositionY = [17]
 direction = "RIGHT"
 running = True
+score = 0
 
-def draw_maze(maze, screen, screen_width, screen_height):
+def connect_to_database():
+    try:
+      
+        conn = mysql.connector.connect(
+            host='localhost',
+            port=3306,
+            user='root',
+            password='',
+            database='Snake'
+        )
+        return conn
+    except mysql.connector.Error as err:
+        print(f"Error al conectarse a la base de datos: {err}")
+        return None
+
+def top5():
+    try:
+        conn = connect_to_database()
+        if conn is None:
+            return
+
+        cursor = conn.cursor()
+        select_query = "SELECT mayorPuntaje, usuario FROM puntaje ORDER BY mayorPuntaje DESC LIMIT 5"
+        cursor.execute(select_query)
+
+
+        top_scores = cursor.fetchall()
+
+
+        for rank, (score, user) in enumerate(top_scores, start=1):
+            print(f"#{rank} - Puntaje: {score}, Usuario: {user}")
+
+        cursor.close()
+        conn.close()
+
+    except mysql.connector.Error as err:
+        print(f"Error al obtener los mejores puntajes: {err}")
+
+def insert_puntaje(mayor_puntaje, usuario):
+    try:
+        conn = connect_to_database()
+        if conn is None:
+            return
+
+        cursor = conn.cursor()
+
+
+        insert_query = "INSERT INTO puntaje (mayorPuntaje, usuario) VALUES (%s, %s)"
+        data = (mayor_puntaje, usuario)
+        cursor.execute(insert_query, data)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+    except mysql.connector.Error as err:
+        print(f"Error al insertar el puntaje: {err}")
+
+
+
+
+def draw_maze(maze, screen):
     block_size = 25
 
     for row in range(len(maze)):
@@ -16,6 +79,7 @@ def draw_maze(maze, screen, screen_width, screen_height):
             if maze[row][col] == 1:
                 pygame.draw.rect(screen, (255, 255, 255), (col * block_size, row * block_size, block_size, block_size))
             elif maze[row][col] == 2:
+                
                 pygame.draw.rect(screen, (0, 0, 255), (col * block_size, row * block_size, block_size, block_size))
             elif maze[row][col] == 3:
                 pygame.draw.rect(screen, (0, 255, 0), (col * block_size, row * block_size, block_size, block_size))
@@ -24,9 +88,9 @@ def draw_maze(maze, screen, screen_width, screen_height):
 
     pygame.display.flip()
 
-
+conn = connect_to_database()
 def start_game():
-    global snakePositionX, snakePositionY, direction, running
+    global snakePositionX, snakePositionY, direction, running, score
 
     screen_width = 1200
     screen_height = 900
@@ -37,9 +101,9 @@ def start_game():
 
     with open("maze.txt", "r") as file:
         maze = [[int(cell) for cell in line.strip().split(",")] for line in file if line.strip()]
-
     addFood(maze)
 
+    time.sleep(2.5)
     while running:
         maze[snakePositionY[0]][snakePositionX[0]] = 2
         for event in pygame.event.get():
@@ -48,40 +112,42 @@ def start_game():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-                if event.key == pygame.K_w or event.key == pygame.K_UP:
+                elif event.key == pygame.K_w or event.key == pygame.K_UP:
                     if(direction != "DOWN"):
                         direction = "UP"
-                if event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                     if(direction != "UP"):
                         direction = "DOWN"
-                if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     if(direction != "LEFT"):
                         direction = "RIGHT"
-                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     if(direction != "RIGHT"):
                         direction = "LEFT"
         move(maze)
 
 
         if(running == True):
-            draw_maze(maze, screen, screen_width, screen_height)
-        if maze[19][28] == 2:
-            running = False
+            draw_maze(maze, screen)
 
-
-        time.sleep(0.1)
+        time.sleep(0.04)
 
     pygame.quit()
 
 def addFood(maze):
-    foodY = random.randint(1, 34)
-    foodX = random.randint(1, 46)
-    if (maze[foodY][foodX] == maze[23][17]):
-        maze[foodY][foodX] = 3
-    else:
-        #Preguntar porque no sirve la recursividad.
-        #addFood(maze)
-        maze[foodX+1][foodY+1] = 3
+    global score
+    score += 1
+    added = False
+    while not added:
+        foodY = random.randint(1, 34)
+        foodX = random.randint(1, 46)
+        if (maze[foodY][foodX] == 1):
+            maze[foodY][foodX] = 3
+            added = True
+        #else:
+            #Preguntar porque no sirve la recursividad.
+            #addFood(maze)
+            #maze[foodX+1][foodY+1] = 3
 
 
 def move(maze):
@@ -154,5 +220,10 @@ def moveSnakeBody(snakePosition):
         newSnakePosition.append(snakePosition[i - 1])
     snakePosition[:] = newSnakePosition
 
+nombre = input("Ingresa tu nombre para empezar a jugar: ")
 
 start_game()
+
+insert_puntaje(score, nombre)
+
+top5()
