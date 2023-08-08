@@ -102,35 +102,41 @@ def start_game():
     with open("maze.txt", "r") as file:
         maze = [[int(cell) for cell in line.strip().split(",")] for line in file if line.strip()]
     addFood(maze)
-
+    moved = False
     time.sleep(2.5)
     while running:
         maze[snakePositionY[0]][snakePositionX[0]] = 2
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-                elif event.key == pygame.K_w or event.key == pygame.K_UP:
-                    if(direction != "DOWN"):
-                        direction = "UP"
-                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                    if(direction != "UP"):
-                        direction = "DOWN"
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    if(direction != "LEFT"):
-                        direction = "RIGHT"
-                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    if(direction != "RIGHT"):
-                        direction = "LEFT"
+                if moved == False:
+                    if event.key == pygame.K_w or event.key == pygame.K_UP:
+                        if(direction != "DOWN"):
+                            direction = "UP"
+                            moved = True
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        if(direction != "UP"):
+                            direction = "DOWN"
+                            moved = True
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        if(direction != "LEFT"):
+                            direction = "RIGHT"
+                            moved = True
+                    elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        if(direction != "RIGHT"):
+                            direction = "LEFT"
+                            moved = True
         move(maze)
-
+        moved = False
 
         if(running == True):
             draw_maze(maze, screen)
 
-        time.sleep(0.04)
+        time.sleep(0.06)
 
     pygame.quit()
 
